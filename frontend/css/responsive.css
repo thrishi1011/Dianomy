@@ -1,0 +1,96 @@
+/* ═══════════════════════════════════════════════════════════
+   DIANOMY — Responsive Styles
+   Mobile-first breakpoints
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Small screens (≥640px) ── */
+@media (min-width: 640px) {
+    .nav-link .label {
+        display: inline;
+    }
+
+    .hero-title {
+        font-size: 4.375rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+    }
+
+    .hero-actions {
+        flex-direction: row;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cta-title {
+        font-size: 1.875rem;
+    }
+
+    .form-grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ── Medium screens (≥768px) ── */
+@media (min-width: 768px) {
+    .stats-row {
+        gap: 2rem;
+    }
+}
+
+/* ── Large screens (≥1024px) ── */
+@media (min-width: 1024px) {
+    .features-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ── Small screen adjustments ── */
+@media (max-width: 639px) {
+    .nav-link .label {
+        display: none;
+    }
+
+    .hero-title {
+        font-size: 3.125rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.125rem;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+    }
+
+    .stats-row {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .stats-row>div {
+        flex: 1;
+        min-width: 5rem;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .toast-container {
+        bottom: 1rem;
+        right: 1rem;
+        left: 1rem;
+    }
+}

@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href="frontend/assets/logo.svg" />
   <title>DIANOMY — Campus Last-Mile Delivery</title>
   <meta name="description" content="Student-driven last-mile delivery app. Gate to hostel, delivered by students." />
   <meta name="author" content="DIANOMY" />
@@ -16,11 +16,56 @@
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="DIANOMY — Campus Delivery" />
+
+  <!-- Design System -->
+  <link rel="stylesheet" href="design/tokens.css" />
+  <link rel="stylesheet" href="design/components.css" />
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="frontend/css/main.css" />
+  <link rel="stylesheet" href="frontend/css/animations.css" />
+  <link rel="stylesheet" href="frontend/css/themes.css" />
+  <link rel="stylesheet" href="frontend/css/responsive.css" />
 </head>
 
 <body>
-  <div id="root"></div>
-  <script type="module" src="/frontend/js/app.tsx"></script>
+  <!-- Animated Canvas Background -->
+  <canvas id="animated-bg"></canvas>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="main-navbar"></nav>
+
+  <!-- App Container — SPA Pages -->
+  <main id="app">
+    <div class="page" id="page-home"></div>
+    <div class="page" id="page-login"></div>
+    <div class="page" id="page-dashboard"></div>
+    <div class="page" id="page-create"></div>
+    <div class="page" id="page-runner"></div>
+    <div class="page" id="page-runner-dashboard"></div>
+    <div class="page" id="page-profile"></div>
+    <div class="page" id="page-404"></div>
+  </main>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+  <!-- Backend Scripts -->
+  <script src="backend/js/firebase-config.js"></script>
+  <script src="backend/js/storage.js"></script>
+  <script src="backend/js/data.js"></script>
+  <script src="backend/js/notifications.js"></script>
+
+  <!-- Frontend Scripts -->
+  <script src="frontend/js/settings.js"></script>
+  <script src="frontend/js/router.js"></script>
+  <script src="frontend/js/auth.js"></script>
+  <script src="frontend/js/dashboard.js"></script>
+  <script src="frontend/js/offers.js"></script>
+  <script src="frontend/js/profile.js"></script>
+  <script src="frontend/js/app.js"></script>
 </body>
 
 </html>

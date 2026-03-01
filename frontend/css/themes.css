@@ -1,0 +1,44 @@
+/* ═══════════════════════════════════════════════════════════
+   DIANOMY — Theme Styles
+   Currently dark-only. Prepared for future light mode.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Dark theme is the default — tokens in design/tokens.css */
+
+/* Light theme (future, activate via data-theme="light" on <html>) */
+[data-theme="light"] {
+    --background: hsl(0, 0%, 98%);
+    --foreground: hsl(225, 30%, 12%);
+
+    --card: hsl(0, 0%, 100%);
+    --card-foreground: hsl(225, 30%, 12%);
+
+    --secondary: hsl(220, 14%, 92%);
+    --secondary-foreground: hsl(225, 30%, 12%);
+
+    --muted: hsl(220, 14%, 96%);
+    --muted-foreground: hsl(220, 10%, 50%);
+
+    --border: hsl(220, 13%, 85%);
+    --input: hsl(220, 13%, 85%);
+
+    --glass: hsl(0, 0%, 100%);
+    --glass-border: hsl(220, 13%, 88%);
+    --glass-highlight: hsl(220, 13%, 80%);
+
+    --glass-h: 0;
+    --glass-s: 0%;
+    --glass-l: 100%;
+    --glass-border-h: 220;
+    --glass-border-s: 13%;
+    --glass-border-l: 88%;
+    --glass-highlight-h: 220;
+    --glass-highlight-s: 13%;
+    --glass-highlight-l: 80%;
+    --secondary-h: 220;
+    --secondary-s: 14%;
+    --secondary-l: 92%;
+    --border-h: 220;
+    --border-s: 13%;
+    --border-l: 85%;
+}

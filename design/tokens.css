@@ -1,0 +1,65 @@
+/* ═══════════════════════════════════════════════════════════
+   DIANOMY — Design Tokens
+   Single source of truth for colors, typography, spacing.
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  /* ── Core Palette ── */
+  --background:          hsl(225, 30%, 6%);
+  --foreground:          hsl(210, 40%, 96%);
+
+  --card:                hsl(225, 25%, 12%);
+  --card-foreground:     hsl(210, 40%, 96%);
+
+  --primary:             hsl(16, 90%, 58%);
+  --primary-foreground:  hsl(0, 0%, 100%);
+
+  --secondary:           hsl(225, 20%, 18%);
+  --secondary-foreground:hsl(210, 40%, 96%);
+
+  --muted:               hsl(225, 20%, 16%);
+  --muted-foreground:    hsl(220, 15%, 55%);
+
+  --accent:              hsl(190, 80%, 50%);
+  --accent-foreground:   hsl(225, 30%, 6%);
+
+  --destructive:         hsl(0, 72%, 51%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+
+  --border:              hsl(225, 15%, 20%);
+  --input:               hsl(225, 15%, 20%);
+  --ring:                hsl(16, 90%, 58%);
+
+  /* ── Custom Tokens ── */
+  --glass:               hsl(225, 25%, 14%);
+  --glass-border:        hsl(225, 15%, 24%);
+  --glass-highlight:     hsl(225, 20%, 28%);
+  --coral:               hsl(16, 90%, 58%);
+  --coral-glow:          hsl(16, 100%, 65%);
+  --navy:                hsl(225, 30%, 6%);
+  --navy-light:          hsl(225, 25%, 12%);
+  --teal:                hsl(190, 80%, 50%);
+
+  /* ── Raw HSL values (for alpha compositing) ── */
+  --coral-h: 16;  --coral-s: 90%;  --coral-l: 58%;
+  --teal-h: 190;  --teal-s: 80%;   --teal-l: 50%;
+  --glass-h: 225; --glass-s: 25%;  --glass-l: 14%;
+  --glass-border-h: 225; --glass-border-s: 15%; --glass-border-l: 24%;
+  --glass-highlight-h: 225; --glass-highlight-s: 20%; --glass-highlight-l: 28%;
+  --secondary-h: 225; --secondary-s: 20%; --secondary-l: 18%;
+  --border-h: 225; --border-s: 15%; --border-l: 20%;
+  --primary-h: 16; --primary-s: 90%; --primary-l: 58%;
+  --destructive-h: 0; --destructive-s: 72%; --destructive-l: 51%;
+
+  /* ── Spacing / Radii ── */
+  --radius:  0.75rem;
+  --radius-sm: 0.5rem;
+  --radius-lg: 1rem;
+
+  /* ── Typography ── */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body:    'Inter', 'Space Grotesk', system-ui, sans-serif;
+  --font-mono:    'SF Mono', 'Fira Code', monospace;
+}
