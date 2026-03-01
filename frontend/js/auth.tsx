@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Mail, ShieldCheck, GraduationCap, AlertCircle, ArrowLeft, KeyRound } from "lucide-react";
 import GlassCard from "@/components/GlassCard";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { sounds } from "@/lib/sounds";
 import { useAuth, simulateFetchUserDetails } from "@/lib/AuthContext";
 
@@ -13,13 +14,13 @@ const OTP_LENGTH = 6;
 const Login = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
-    const [step, setStep] = useState < Step > ("email");
+    const [step, setStep] = useState<Step>("email");
     const [email, setEmail] = useState("");
-    const [otp, setOtp] = useState < string[] > (new Array(OTP_LENGTH).fill(""));
+    const [otp, setOtp] = useState<string[]>(new Array(OTP_LENGTH).fill(""));
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [sentOtp, setSentOtp] = useState("");
-    const otpRefs = useRef < (HTMLInputElement | null)[] > ([]);
+    const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     const generateOtp = () => {
         const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -115,12 +116,8 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-hero overflow-hidden flex items-center justify-center px-6">
-            {/* Decorative orbs */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary/5 blur-3xl animate-pulse-glow" />
-                <div className="absolute bottom-1/4 -left-32 w-80 h-80 rounded-full bg-accent/5 blur-3xl animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
-            </div>
+        <div className="min-h-screen overflow-hidden flex items-center justify-center px-6 text-foreground relative">
+            <AnimatedBackground />
 
             <motion.div
                 className="w-full max-w-md relative z-10"

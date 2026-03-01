@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 
 const Runner = () => {
     return (
-        <div className="min-h-screen bg-background bg-gradient-mesh pt-20 px-4 pb-10">
+        <div className="min-h-screen pt-20 px-4 pb-10 relative">
+            <AnimatedBackground />
             <Navbar />
             <div className="max-w-2xl mx-auto">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">

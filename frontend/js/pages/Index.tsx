@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Package, MapPin, Star, Zap, Shield, Clock } from "lucide-react";
 import FeatureCard from "@/components/FeatureCard";
 import GlassCard from "@/components/GlassCard";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { sounds } from "@/lib/sounds";
 
 const features = [
@@ -29,13 +30,8 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-hero overflow-hidden">
-      {/* Decorative orbs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-primary/5 blur-3xl animate-pulse-glow" />
-        <div className="absolute top-1/3 -right-48 w-[500px] h-[500px] rounded-full bg-accent/5 blur-3xl animate-pulse-glow" style={{ animationDelay: "1s" }} />
-        <div className="absolute -bottom-32 left-1/3 w-80 h-80 rounded-full bg-primary/5 blur-3xl animate-pulse-glow" style={{ animationDelay: "2s" }} />
-      </div>
+    <div className="min-h-screen relative overflow-hidden">
+      <AnimatedBackground />
 
       {/* Hero */}
       <section className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 text-center">

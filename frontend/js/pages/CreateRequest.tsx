@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import GlassCard from "@/components/GlassCard";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { sounds } from "@/lib/sounds";
 
 const CreateRequest = () => {
@@ -19,7 +20,8 @@ const CreateRequest = () => {
     "w-full px-4 py-3 rounded-lg bg-secondary/60 border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 font-body input-interactive";
 
   return (
-    <div className="min-h-screen bg-background bg-gradient-mesh pt-20 px-4 pb-10">
+    <div className="min-h-screen pt-20 px-4 pb-10 relative">
+      <AnimatedBackground />
       <Navbar />
       <motion.div
         className="max-w-lg mx-auto"

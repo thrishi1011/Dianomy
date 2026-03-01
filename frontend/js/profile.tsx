@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { User, MapPin, Star, Package, Clock, LogOut, Phone, Building, Briefcase, GraduationCap } from "lucide-react";
 import GlassCard from "@/components/GlassCard";
 import Navbar from "@/components/Navbar";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { useAuth } from "@/lib/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -12,7 +13,8 @@ const Profile = () => {
   // If not logged in, redirect to login
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-6">
+      <div className="min-h-screen flex items-center justify-center px-6 relative">
+        <AnimatedBackground />
         <GlassCard className="p-8 text-center max-w-sm" variant="strong">
           <User size={40} className="text-muted-foreground mx-auto mb-4" />
           <h2 className="font-display text-lg font-bold text-foreground mb-2">Not signed in</h2>
@@ -42,7 +44,8 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen relative">
+      <AnimatedBackground />
       <Navbar />
       <div className="pt-24 px-6 pb-12 max-w-xl mx-auto space-y-5">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>

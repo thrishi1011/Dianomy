@@ -2,14 +2,15 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import RequestCard, { DeliveryRequest } from "@/components/RequestCard";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { mockRequests } from "@/lib/mockData";
 import { sounds } from "@/lib/sounds";
 
 const tabs = ["All", "Pending", "Accepted", "Delivered"] as const;
 
 const Dashboard = () => {
-  const [requests, setRequests] = useState < DeliveryRequest[] > (mockRequests);
-  const [activeTab, setActiveTab] = useState < string > ("All");
+  const [requests, setRequests] = useState<DeliveryRequest[]>(mockRequests);
+  const [activeTab, setActiveTab] = useState<string>("All");
 
   const filtered = activeTab === "All" ? requests : requests.filter((r) => r.status === activeTab.toLowerCase());
 
@@ -21,7 +22,8 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background bg-gradient-mesh pt-20 px-4 pb-10">
+    <div className="min-h-screen pt-20 px-4 pb-10 relative">
+      <AnimatedBackground />
       <Navbar />
       <div className="max-w-2xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
