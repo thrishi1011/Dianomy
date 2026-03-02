@@ -76,7 +76,7 @@ const Offers = {
           // Trigger "Email" notification for User 1
           await db.collection('notifications').add({
             toEmail: request.requesterEmail,
-            message: `Your order "${request.description}" has been accepted by ${user.name} (${user.email})!`,
+            message: `Order Accepted: Your order "${request.description}" (Hostel: ${request.hostel}, Room: ${request.room}) has been accepted by ${user.name}. You can contact the runner at ${user.email}.`,
             orderId: id,
             type: 'acceptance',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()

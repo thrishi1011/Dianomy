@@ -359,11 +359,17 @@ function showLogoutDialog() {
 
   document.getElementById('logout-backdrop').addEventListener('click', () => overlay.remove());
   document.getElementById('logout-cancel').addEventListener('click', () => { sounds.click(); overlay.remove(); });
-  document.getElementById('logout-confirm').addEventListener('click', () => {
+  document.getElementById('logout-confirm').addEventListener('click', async function () {
     sounds.click();
-    Storage.removeUser();
-    overlay.remove();
-    Router.navigate('#/');
+    try {
+      await auth.signOut();
+      Storage.removeUser();
+      overlay.remove();
+      Router.navigate('#/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      Notifications.error('Logout failed. Please try again.');
+    }
   });
 }
 

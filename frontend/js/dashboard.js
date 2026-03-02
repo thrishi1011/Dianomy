@@ -6,7 +6,7 @@
 const Dashboard = {
   requests: [],
   activeTab: 'All',
-  tabs: ['All', 'Pending', 'Accepted', 'Delivered'],
+  tabs: ['All', 'Pending', 'Accepted', 'Waiting Confirmation', 'Delivered'],
 
   init() {
     this._listenToOrders();
@@ -36,15 +36,15 @@ const Dashboard = {
     page.classList.add('active');
     page.className = 'page active dashboard-page';
 
-    // Filter by tab
     const filtered = this.activeTab === 'All'
-      ? this.requests
-      : this.requests.filter(r => r.status === this.activeTab.toLowerCase());
+      ? this.requests.filter(r => r.status !== 'delivered')
+      : this.requests.filter(r => r.status === this.activeTab.toLowerCase().replace(' ', '_'));
 
     const counts = {
       All: this.requests.length,
       Pending: this.requests.filter(r => r.status === 'pending').length,
       Accepted: this.requests.filter(r => r.status === 'accepted').length,
+      'Waiting Confirmation': this.requests.filter(r => r.status === 'waiting_confirmation').length,
       Delivered: this.requests.filter(r => r.status === 'delivered').length
     };
 
@@ -110,6 +110,15 @@ const Dashboard = {
             Mark as Delivered
           </button>
         ` : ''}
+        ${!showAccept && req.status === 'waiting_confirmation' && Storage.getUser()?.email === req.requesterEmail ? `
+          <div style="display:flex; gap:0.5rem; margin-top:0.5rem">
+            <button class="btn btn-primary" data-confirm-id="${req.id}" style="flex:1">Confirm Delivered</button>
+            <button class="btn btn-outline" data-reject-id="${req.id}" style="flex:1; border-color:var(--destructive); color:var(--destructive)">Not Delivered</button>
+          </div>
+        ` : ''}
+        ${!showAccept && req.status === 'waiting_confirmation' && Storage.getUser()?.email !== req.requesterEmail ? `
+          <p class="empty-state" style="font-size:0.75rem; margin-top:0.5rem">Waiting for requester to confirm delivery...</p>
+        ` : ''}
       </div>
     `;
   },
@@ -126,16 +135,59 @@ const Dashboard = {
       });
     });
 
-    // Mark as Delivered clicks
+    // Mark as Delivered clicks (Runner action)
     page.querySelectorAll('[data-deliver-id]').forEach(function (btn) {
       btn.addEventListener('click', async function () {
         const id = this.getAttribute('data-deliver-id');
+        const req = self.requests.find(r => r.id === id);
+        try {
+          await db.collection('orders').doc(id).update({
+            status: 'waiting_confirmation'
+          });
+
+          // Notify Requester
+          await db.collection('notifications').add({
+            toEmail: req.requesterEmail,
+            message: `Action Required: Your runner ${req.acceptedBy} has marked your order "${req.description}" as delivered. Please confirm in the app.`,
+            orderId: id,
+            type: 'delivery_confirmation',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          sounds.success();
+          Notifications.success('Notified requester! Waiting for confirmation.');
+        } catch (error) {
+          Notifications.error('Failed to update status.');
+        }
+      });
+    });
+
+    // Confirm Delivery clicks (Requester action)
+    page.querySelectorAll('[data-confirm-id]').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        const id = this.getAttribute('data-confirm-id');
         try {
           await db.collection('orders').doc(id).update({
             status: 'delivered'
           });
           sounds.success();
-          Notifications.success('Delivery marked as completed!');
+          Notifications.success('Order delivered successfully!');
+        } catch (error) {
+          Notifications.error('Failed to confirm delivery.');
+        }
+      });
+    });
+
+    // Reject Delivery clicks (Requester action)
+    page.querySelectorAll('[data-reject-id]').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        const id = this.getAttribute('data-reject-id');
+        try {
+          await db.collection('orders').doc(id).update({
+            status: 'accepted'
+          });
+          sounds.error();
+          Notifications.info('Order marked as not delivered. Status reset to accepted.');
         } catch (error) {
           Notifications.error('Failed to update status.');
         }

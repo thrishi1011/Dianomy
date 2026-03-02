@@ -147,6 +147,12 @@
     color: var(--accent);
 }
 
+.badge-waiting_confirmation {
+    background: hsla(45, 100%, 50%, 0.15);
+    /* Amber/Orange */
+    color: hsl(45, 100%, 45%);
+}
+
 .badge-delivered {
     background: hsla(var(--teal-h), var(--teal-s), var(--teal-l), 0.2);
     color: var(--accent);
