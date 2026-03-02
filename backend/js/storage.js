@@ -8,7 +8,7 @@ const STORAGE_KEY = 'dianomy_user';
 const Storage = {
   getUser() {
     try {
-      const stored = sessionStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(STORAGE_KEY);
       return stored ? JSON.parse(stored) : null;
     } catch {
       return null;
@@ -17,13 +17,13 @@ const Storage = {
 
   saveUser(user) {
     try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
     } catch { /* noop */ }
   },
 
   removeUser() {
     try {
-      sessionStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY);
     } catch { /* noop */ }
   },
 

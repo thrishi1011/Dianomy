@@ -163,7 +163,7 @@ const Profile = {
 
     const saveBtn = page.querySelector('#profile-save-btn');
     if (saveBtn) {
-      saveBtn.addEventListener('click', function () {
+      saveBtn.addEventListener('click', async function () {
         const user = Storage.getUser();
         if (user) {
           user.name = document.getElementById('edit-name').value;
@@ -172,7 +172,16 @@ const Profile = {
           user.phone = document.getElementById('edit-phone').value;
           user.hostel = document.getElementById('edit-hostel').value;
           user.avatarInitial = user.name.charAt(0).toUpperCase();
+
           Storage.saveUser(user);
+
+          // Save to Firestore for persistence across logins
+          try {
+            await db.collection('users').doc(user.uid).set(user, { merge: true });
+            console.log('[DIANOMY] Profile updated in Firestore');
+          } catch (err) {
+            console.error('Error updating profile in Firestore:', err);
+          }
         }
 
         self.isEditing = false;
