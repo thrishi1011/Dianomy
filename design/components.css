@@ -158,6 +158,11 @@
     color: var(--accent);
 }
 
+.badge-not_delivered {
+    background: hsla(var(--destructive-h), var(--destructive-s), var(--destructive-l), 0.15);
+    color: var(--destructive);
+}
+
 /* ── Card / Interactive Card ── */
 .card {
     border-radius: var(--radius);
@@ -458,6 +463,15 @@
     gap: 0.5rem;
     overflow-x: auto;
     padding-bottom: 0.25rem;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.tabs::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
 }
 
 .tab-btn {

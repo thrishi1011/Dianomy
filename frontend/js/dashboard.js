@@ -6,7 +6,7 @@
 const Dashboard = {
   requests: [],
   activeTab: 'All',
-  tabs: ['All', 'Pending', 'Accepted', 'Waiting Confirmation', 'Delivered'],
+  tabs: ['All', 'Pending', 'Accepted', 'Waiting Confirmation', 'Delivered', 'Not Delivered'],
 
   init() {
     this._listenToOrders();
@@ -37,15 +37,16 @@ const Dashboard = {
     page.className = 'page active dashboard-page';
 
     const filtered = this.activeTab === 'All'
-      ? this.requests.filter(r => r.status !== 'delivered')
+      ? this.requests.filter(r => r.status !== 'delivered' && r.status !== 'not_delivered')
       : this.requests.filter(r => r.status === this.activeTab.toLowerCase().replace(' ', '_'));
 
     const counts = {
-      All: this.requests.length,
+      All: this.requests.filter(r => r.status !== 'delivered' && r.status !== 'not_delivered').length,
       Pending: this.requests.filter(r => r.status === 'pending').length,
       Accepted: this.requests.filter(r => r.status === 'accepted').length,
       'Waiting Confirmation': this.requests.filter(r => r.status === 'waiting_confirmation').length,
-      Delivered: this.requests.filter(r => r.status === 'delivered').length
+      Delivered: this.requests.filter(r => r.status === 'delivered').length,
+      'Not Delivered': this.requests.filter(r => r.status === 'not_delivered').length
     };
 
     page.innerHTML = `
@@ -78,7 +79,7 @@ const Dashboard = {
   _renderRequestCard(req, showAccept) {
     const statusClass = 'badge-' + req.status;
     const isRequester = Storage.getUser()?.email === req.requesterEmail;
-    const canViewRunner = !showAccept && isRequester && (req.status === 'accepted' || req.status === 'waiting_confirmation' || req.status === 'delivered');
+    const canViewRunner = !showAccept && isRequester && (req.status === 'accepted' || req.status === 'waiting_confirmation' || req.status === 'delivered' || req.status === 'not_delivered');
 
     return `
       <div class="glass card card-hover p-6 animate-fade-in-up ${canViewRunner ? 'cursor-pointer' : ''}" 
@@ -189,6 +190,21 @@ const Dashboard = {
     });
 
     // Reject Delivery clicks (Requester action)
+    page.querySelectorAll('[data-reject-id]').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        const id = this.getAttribute('data-reject-id');
+        try {
+          await db.collection('orders').doc(id).update({
+            status: 'not_delivered'
+          });
+          sounds.error();
+          Notifications.error('Marked as Not Delivered. Check the Not Delivered tab for details.');
+        } catch (error) {
+          Notifications.error('Failed to update status.');
+        }
+      });
+    });
+
     // View Runner Details clicks (Requester action)
     page.querySelectorAll('[data-view-runner="true"]').forEach(function (card) {
       card.addEventListener('click', function (e) {
@@ -219,7 +235,9 @@ const Dashboard = {
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
           <h2 style="font-family:var(--font-display);font-size:1.125rem;font-weight:700;color:var(--foreground);margin-bottom:0.25rem;text-align:center">Runner Details</h2>
-          <p style="font-size:0.875rem;color:var(--muted-foreground);margin-bottom:1.5rem;text-align:center">This student is handling your delivery.</p>
+          <p style="font-size:0.875rem;color:${req.status === 'not_delivered' ? 'var(--destructive)' : 'var(--muted-foreground)'};margin-bottom:1.5rem;text-align:center;font-weight:${req.status === 'not_delivered' ? '600' : '400'}">
+            ${req.status === 'not_delivered' ? 'These are the details of the candidate, you find him with these details.' : 'This student is handling your delivery.'}
+          </p>
           
           <div class="glass card p-4" style="margin-bottom:1.5rem">
             <div style="margin-bottom:0.75rem">
