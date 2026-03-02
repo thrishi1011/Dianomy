@@ -167,11 +167,13 @@
 }
 
 .card-hover:hover {
-    transform: translateY(-4px) scale(1.01);
-    box-shadow: 0 12px 30px hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.1),
-        0 4px 12px rgba(0, 0, 0, 0.2);
-    border-color: hsla(var(--glass-highlight-h), var(--glass-highlight-s), var(--glass-highlight-l), 0.7);
-    cursor: pointer;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.4);
+}
+
+.card.cursor-pointer:hover {
+    border-color: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.4);
+    background: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.05);
 }
 
 /* ── Glows ── */

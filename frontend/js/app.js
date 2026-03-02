@@ -621,6 +621,9 @@ function render404Page() {
 // Removed Email Link handling as we are now Google-only
 
 function initAuthListener() {
+  // Set persistence to LOCAL explicitly to ensure consistency across devices
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
   auth.onAuthStateChanged((user) => {
     if (user) {
       // Top-level domain restriction enforcement
@@ -670,10 +673,14 @@ function initAuthListener() {
       // Automatic redirection if on login or landing page
       const currentHash = window.location.hash || '#/';
       if (currentHash === '#/login' || currentHash === '#/') {
-        console.log('[DIANOMY] Authenticated user on auth/landing page, redirecting to profile...');
-        setTimeout(() => {
-          Router.navigate('#/profile');
-        }, 100);
+        // Double check if we still have a user in Firebase Auth before redirecting
+        // This helps prevent auto-login on mobile immediately after signOut
+        if (auth.currentUser) {
+          console.log('[DIANOMY] Authenticated user on auth/landing page, redirecting to profile...');
+          setTimeout(() => {
+            Router.navigate('#/profile');
+          }, 100);
+        }
       }
     } else {
       Storage.removeUser();

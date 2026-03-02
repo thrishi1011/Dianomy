@@ -77,15 +77,22 @@ const Dashboard = {
 
   _renderRequestCard(req, showAccept) {
     const statusClass = 'badge-' + req.status;
+    const isRequester = Storage.getUser()?.email === req.requesterEmail;
+    const canViewRunner = !showAccept && isRequester && (req.status === 'accepted' || req.status === 'waiting_confirmation' || req.status === 'delivered');
+
     return `
-      <div class="glass card card-hover p-6 animate-fade-in-up" data-request-id="${req.id}" style="padding:1.25rem">
+      <div class="glass card card-hover p-6 animate-fade-in-up ${canViewRunner ? 'cursor-pointer' : ''}" 
+           data-request-id="${req.id}" 
+           ${canViewRunner ? 'data-view-runner="true"' : ''}
+           style="padding:1.25rem">
         <div class="request-card-header">
           <div>
             <h3 class="request-title">${req.description}</h3>
             <p class="request-subtitle">by ${req.requester}</p>
           </div>
-          <span class="badge ${statusClass}">${req.status}</span>
+          <span class="badge ${statusClass}">${req.status.replace('_', ' ')}</span>
         </div>
+        ${canViewRunner ? `<p style="font-size:0.75rem; color:var(--primary); margin-top:-0.5rem; margin-bottom:0.75rem; font-weight:600">Click to view Runner details</p>` : ''}
         <div class="request-meta">
           <span class="request-meta-item">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary)"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -179,19 +186,60 @@ const Dashboard = {
     });
 
     // Reject Delivery clicks (Requester action)
-    page.querySelectorAll('[data-reject-id]').forEach(function (btn) {
-      btn.addEventListener('click', async function () {
-        const id = this.getAttribute('data-reject-id');
-        try {
-          await db.collection('orders').doc(id).update({
-            status: 'accepted'
-          });
-          sounds.error();
-          Notifications.info('Order marked as not delivered. Status reset to accepted.');
-        } catch (error) {
-          Notifications.error('Failed to update status.');
+    // View Runner Details clicks (Requester action)
+    page.querySelectorAll('[data-view-runner="true"]').forEach(function (card) {
+      card.addEventListener('click', function (e) {
+        // Prevent if clicking other buttons inside card
+        if (e.target.closest('button')) return;
+
+        const id = this.getAttribute('data-request-id');
+        const req = self.requests.find(r => r.id === id);
+        if (req && req.runnerName) {
+          self.showRunnerDetailsDialog(req);
         }
       });
     });
+  },
+
+  showRunnerDetailsDialog(req) {
+    const existing = document.getElementById('runner-details-dialog');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'runner-details-dialog';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-backdrop" id="runner-details-backdrop"></div>
+      <div class="modal-content">
+        <div class="glass-strong p-6" style="border-radius:var(--radius)">
+          <div style="width:3rem;height:3rem;border-radius:50%;background:hsla(var(--primary-h),var(--primary-s),var(--primary-l),0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:var(--primary)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h2 style="font-family:var(--font-display);font-size:1.125rem;font-weight:700;color:var(--foreground);margin-bottom:0.25rem;text-align:center">Runner Details</h2>
+          <p style="font-size:0.875rem;color:var(--muted-foreground);margin-bottom:1.5rem;text-align:center">This student is handling your delivery.</p>
+          
+          <div class="glass card p-4" style="margin-bottom:1.5rem">
+            <div style="margin-bottom:0.75rem">
+              <label class="form-label" style="font-size:0.65rem">FULL NAME</label>
+              <p style="font-weight:600; font-size:1rem">${req.runnerName}</p>
+            </div>
+            <div style="margin-bottom:0.75rem">
+              <label class="form-label" style="font-size:0.65rem">ROLL NUMBER</label>
+              <p style="font-family:var(--font-mono); font-size:0.9rem">${req.runnerRoll}</p>
+            </div>
+            <div>
+              <label class="form-label" style="font-size:0.65rem">EMAIL</label>
+              <p style="font-size:0.875rem">${req.acceptedByEmail}</p>
+            </div>
+          </div>
+          
+          <button class="btn btn-primary w-full" id="details-close">Close</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    document.getElementById('runner-details-backdrop').addEventListener('click', () => overlay.remove());
+    document.getElementById('details-close').addEventListener('click', () => { sounds.click(); overlay.remove(); });
   }
 };
