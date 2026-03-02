@@ -29,9 +29,10 @@ const Profile = {
       return;
     }
 
-    const ordersPosted = Dashboard.requests.filter(r => r.requester === user.name).length;
-    const ordersAccepted = Dashboard.requests.filter(r => r.status === 'accepted' && r.acceptedBy === user.name).length;
-    const ordersDelivered = Dashboard.requests.filter(r => r.status === 'delivered' && r.acceptedBy === user.name).length;
+    const userEmail = user.email;
+    const ordersPosted = Dashboard.requests.filter(r => r.requesterEmail === userEmail).length;
+    const ordersAccepted = Dashboard.requests.filter(r => (r.status === 'accepted' || r.status === 'waiting_confirmation' || r.status === 'delivered') && r.acceptedByEmail === userEmail).length;
+    const ordersDelivered = Dashboard.requests.filter(r => r.status === 'delivered' && r.acceptedByEmail === userEmail).length;
 
     const googleBadge = user.provider === 'google' ? `
       <span class="glass-subtle profile-provider-badge">
@@ -165,40 +166,70 @@ const Profile = {
     if (saveBtn) {
       saveBtn.addEventListener('click', async function () {
         const user = Storage.getUser();
-        if (user) {
-          user.name = document.getElementById('edit-name').value;
-          user.year = document.getElementById('edit-year').value;
-          user.department = document.getElementById('edit-dept').value;
-          user.phone = document.getElementById('edit-phone').value;
-          user.hostel = document.getElementById('edit-hostel').value;
-          user.avatarInitial = user.name.charAt(0).toUpperCase();
+        const userRef = db.collection('users').doc(user.uid);
 
-          Storage.saveUser(user);
-
-          // Save to Firestore for persistence across logins
-          try {
-            await db.collection('users').doc(user.uid).set(user, { merge: true });
-            console.log('[DIANOMY] Profile updated in Firestore');
-          } catch (err) {
-            console.error('Error updating profile in Firestore:', err);
+        try {
+          const doc = await userRef.get();
+          let userData;
+          if (doc.exists) {
+            userData = doc.data();
+            if (!userData.name) userData.name = user.displayName || 'NITW Student';
+            if (!userData.photoURL) userData.photoURL = user.photoURL || '';
+            userData.lastLogin = Date.now();
+          } else {
+            userData = {
+              uid: user.uid,
+              email: user.email || '',
+              name: user.displayName || 'NITW Student',
+              avatarInitial: (user.displayName || 'U').charAt(0).toUpperCase(),
+              rollNumber: 'Edit profile to set',
+              year: 'Edit profile to set',
+              department: 'Edit profile to set',
+              hostel: 'Edit profile to set',
+              phone: '',
+              provider: 'google',
+              photoURL: user.photoURL || '',
+              lastLogin: Date.now()
+            };
           }
+
+          // Update fields from the form
+          userData.name = document.getElementById('edit-name').value;
+          userData.year = document.getElementById('edit-year').value;
+          userData.department = document.getElementById('edit-dept').value;
+          userData.phone = document.getElementById('edit-phone').value;
+          userData.hostel = document.getElementById('edit-hostel').value;
+          userData.avatarInitial = userData.name.charAt(0).toUpperCase();
+
+          await userRef.set(userData, { merge: true });
+          console.log('[DIANOMY] User profile saved to Firestore:', userData.email);
+
+          Storage.saveUser(userData);
+          self.isEditing = false;
+          sounds.success();
+          Notifications.success('Profile updated successfully!');
+
+          renderNavbar();
+          self.render();
+        } catch (err) {
+          console.error('Error saving profile:', err);
+          Notifications.error('Failed to save profile. Please try again.');
         }
-
-        self.isEditing = false;
-        sounds.success();
-        Notifications.success('Profile updated successfully!');
-
-        // Re-render navbar to update potential name-dependent features
-        renderNavbar();
-        self.render();
       });
     }
 
     const logoutBtn = page.querySelector('#profile-logout-btn');
     if (logoutBtn) {
-      logoutBtn.addEventListener('click', function () {
-        Storage.removeUser();
-        Router.navigate('#/');
+      logoutBtn.addEventListener('click', async function () {
+        sounds.click();
+        try {
+          await auth.signOut();
+          Storage.removeUser();
+          Router.navigate('#/');
+        } catch (err) {
+          console.error('Logout error:', err);
+          Notifications.error('Failed to sign out neatly.');
+        }
       });
     }
   }

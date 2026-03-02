@@ -635,35 +635,33 @@ function initAuthListener() {
       }
 
       // Sync user profile to Firestore
-      const userRef = db.collection('users').doc(user.uid);
-
       userRef.get().then(doc => {
         let userData;
         if (doc.exists) {
-          // Use existing data from Firestore
           userData = doc.data();
-          userData.lastLogin = firebase.firestore.FieldValue.serverTimestamp();
+          // Merge in latest Google info if Firestore is missing it
+          if (!userData.name) userData.name = user.displayName || 'NITW Student';
+          if (!userData.photoURL) userData.photoURL = user.photoURL || '';
+          userData.lastLogin = Date.now();
         } else {
-          // New user, create defaults
           userData = {
             uid: user.uid,
             email: user.email || '',
-            phone: user.phoneNumber || '',
             name: user.displayName || 'NITW Student',
-            displayName: user.displayName || '',
-            photoURL: user.photoURL || '',
-            provider: 'google',
             avatarInitial: (user.displayName || 'U').charAt(0).toUpperCase(),
-            rollNumber: 'Click Edit to update',
-            year: 'Click Edit to update',
-            department: 'Click Edit to update',
-            hostel: 'Click Edit to update',
-            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            rollNumber: 'Edit profile to set',
+            year: 'Edit profile to set',
+            department: 'Edit profile to set',
+            hostel: 'Edit profile to set',
+            phone: '',
+            provider: 'google',
+            photoURL: user.photoURL || '',
+            lastLogin: Date.now()
           };
         }
 
         userRef.set(userData, { merge: true }).then(() => {
-          console.log('[DIANOMY] User profile synced to Firestore');
+          console.log('[DIANOMY] Profile synced:', userData.email);
           Storage.saveUser(userData);
           renderNavbar();
           initNotificationsListener(user.email);

@@ -29,21 +29,22 @@ const Offers = {
     page.classList.add('active');
     page.className = 'page active dashboard-page';
 
-    const pending = this.requests.filter(r => r.status === 'pending');
+    const userEmail = Storage.getUser()?.email;
+    const pendingOrders = this.requests.filter(r => r.status === 'pending' && r.requesterEmail !== userEmail);
 
     page.innerHTML = `
       <div class="page-content animate-fade-in-up">
         <div class="mb-6">
           <h1 class="page-title">Runner Mode</h1>
           <p class="page-subtitle">
-            ${pending.length} pending ${pending.length === 1 ? 'request' : 'requests'} near you. Accept one to start delivering!
+            ${pendingOrders.length} pending ${pendingOrders.length === 1 ? 'request' : 'requests'} near you. Accept one to start delivering!
           </p>
         </div>
 
         <div class="request-list" id="runner-list">
-          ${pending.length === 0
+          ${pendingOrders.length === 0
         ? '<p class="empty-state" style="padding:5rem 0">No pending requests right now. Check back soon!</p>'
-        : pending.map(req => Dashboard._renderRequestCard(req, true)).join('')
+        : pendingOrders.map(req => this._renderRequestCard(req)).join('')
       }
         </div>
       </div>

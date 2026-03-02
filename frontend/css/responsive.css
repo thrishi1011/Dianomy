@@ -111,7 +111,9 @@
         min-width: 5rem;
     }
 
-    .features-grid {
+    .features-grid,
+    .form-grid-2,
+    .profile-details-grid {
         grid-template-columns: 1fr;
     }
 
