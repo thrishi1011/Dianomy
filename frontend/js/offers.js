@@ -144,5 +144,36 @@ const Offers = {
         Notifications.error('Failed to accept order.');
       }
     });
+  },
+
+  _renderRequestCard(req) {
+    return `
+      <div class="glass card card-hover p-6 animate-fade-in-up" style="padding:1.25rem">
+        <div class="request-card-header">
+          <div>
+            <h3 class="request-title">${req.description}</h3>
+            <p class="request-subtitle">by ${req.requester}</p>
+          </div>
+          <span class="badge badge-pending">Pending</span>
+        </div>
+        <div class="request-meta">
+          <span class="request-meta-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary)"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            ${req.hostel}, Room ${req.room}
+          </span>
+          <span class="request-meta-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${req.arrivalTime || 'TBD'}
+          </span>
+          <span class="request-meta-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="M6 3h12l4 6-10 13L2 9Z"/></svg>
+            ₹${req.reward}
+          </span>
+        </div>
+        <button class="btn btn-primary w-full hover-glow-coral" data-accept-id="${req.id}" style="margin-top:0.5rem">
+          Accept & Deliver
+        </button>
+      </div>
+    `;
   }
 };

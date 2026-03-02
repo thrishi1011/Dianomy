@@ -251,7 +251,15 @@ function renderNavbar() {
   const nav = document.getElementById('main-navbar');
   if (!nav) return;
 
-  const isLoggedIn = Storage.isLoggedIn();
+  const currentHash = window.location.hash || '#/';
+  if (currentHash === '#/' || currentHash === '#/login') {
+    nav.style.display = 'none';
+    return;
+  }
+  nav.style.display = 'block';
+
+  const user = Storage.getUser();
+  const isLoggedIn = !!user;
 
   nav.innerHTML = `
     <div class="navbar-inner">

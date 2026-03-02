@@ -88,7 +88,10 @@ const Dashboard = {
         <div class="request-card-header">
           <div>
             <h3 class="request-title">${req.description}</h3>
-            <p class="request-subtitle">by ${req.requester}</p>
+            <p class="request-subtitle">
+              by ${req.requester}
+              ${req.runnerName ? `<br><span style="color:var(--primary); font-size:0.7rem; font-weight:600">Accepted by ${req.runnerName}</span>` : ''}
+            </p>
           </div>
           <span class="badge ${statusClass}">${req.status.replace('_', ' ')}</span>
         </div>
