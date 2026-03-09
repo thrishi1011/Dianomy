@@ -252,7 +252,7 @@ function renderNavbar() {
   if (!nav) return;
 
   const currentHash = window.location.hash || '#/';
-  if (currentHash === '#/' || currentHash === '#/login') {
+  if (currentHash === '#/' || currentHash === '#/login' || currentHash === '#/verify-phone') {
     nav.style.display = 'none';
     return;
   }
@@ -514,7 +514,31 @@ function renderCreateRequestPage() {
           <div class="form-grid-2">
             <div>
               <label class="form-label">Hostel</label>
-              <input class="input-field" placeholder="Hostel A" id="create-hostel" required />
+              <select class="input-field" id="create-hostel" required style="appearance: auto; background-color: var(--secondary); color: white;">
+                <option value="" disabled selected style="background-color: var(--background); color: white;">Select Hostel</option>
+                <option value="Azad Hall" style="background-color: var(--background); color: white;">Azad Hall</option>
+                <option value="Bose Hall" style="background-color: var(--background); color: white;">Bose Hall</option>
+                <option value="Ambedkar Hall" style="background-color: var(--background); color: white;">Ambedkar Hall</option>
+                <option value="Babha Hall" style="background-color: var(--background); color: white;">Babha Hall</option>
+                <option value="Gandhi Hall" style="background-color: var(--background); color: white;">Gandhi Hall</option>
+                <option value="Gokhale Hall" style="background-color: var(--background); color: white;">Gokhale Hall</option>
+                <option value="Radhakrishnan Hall" style="background-color: var(--background); color: white;">Radhakrishnan Hall</option>
+                <option value="Raman Hall" style="background-color: var(--background); color: white;">Raman Hall</option>
+                <option value="Nehru Hall" style="background-color: var(--background); color: white;">Nehru Hall</option>
+                <option value="Patel Hall" style="background-color: var(--background); color: white;">Patel Hall</option>
+                <option value="Tagore Hall" style="background-color: var(--background); color: white;">Tagore Hall</option>
+                <option value="Viswesvraya Hall" style="background-color: var(--background); color: white;">Viswesvraya Hall</option>
+                <option value="Rajendra Prasad Hall" style="background-color: var(--background); color: white;">Rajendra Prasad Hall</option>
+                <option value="Vikram Sarabhai Hall" style="background-color: var(--background); color: white;">Vikram Sarabhai Hall</option>
+                <option value="Kakatiya Hall of Residence" style="background-color: var(--background); color: white;">Kakatiya Hall of Residence</option>
+                <option value="Ramappa Hall of Residence" style="background-color: var(--background); color: white;">Ramappa Hall of Residence</option>
+                <option value="International Students Hall" style="background-color: var(--background); color: white;">International Students Hall</option>
+                <option value="Priyadarshini Hall" style="background-color: var(--background); color: white;">Priyadarshini Hall</option>
+                <option value="Sarojini Hall" style="background-color: var(--background); color: white;">Sarojini Hall</option>
+                <option value="New LH-A" style="background-color: var(--background); color: white;">New LH-A</option>
+                <option value="New LH-B" style="background-color: var(--background); color: white;">New LH-B</option>
+                <option value="New LH-C" style="background-color: var(--background); color: white;">New LH-C</option>
+              </select>
             </div>
             <div>
               <label class="form-label">Room Number</label>
@@ -524,12 +548,23 @@ function renderCreateRequestPage() {
           <div class="form-grid-2">
             <div>
               <label class="form-label">Expected Arrival</label>
-              <input class="input-field" placeholder="1:30 PM" id="create-time" required />
+              <select class="input-field" id="create-time" required style="appearance: auto; background-color: var(--secondary); color: white;">
+                <option value="" disabled selected style="background-color: var(--background); color: white;">Select Time</option>
+                <option value="ASAP" style="background-color: var(--background); color: white;">ASAP (Next 15 mins)</option>
+                <option value="30 mins" style="background-color: var(--background); color: white;">In 30 mins</option>
+                <option value="1 hour" style="background-color: var(--background); color: white;">In 1 hour</option>
+                <option value="Evening" style="background-color: var(--background); color: white;">Today Evening</option>
+                <option value="Tomorrow" style="background-color: var(--background); color: white;">Tomorrow</option>
+              </select>
             </div>
             <div>
               <label class="form-label">Reward (₹)</label>
               <input class="input-field" type="number" placeholder="30" id="create-reward" required />
             </div>
+          </div>
+          <div style="margin-top:1rem">
+            <label class="form-label">Delivery Instructions (Visible to Runner after acceptance)</label>
+            <textarea class="input-field" id="create-instructions" placeholder="e.g. Call me when you reach the gate, or park near the main stairs." style="min-height:80px; padding:0.75rem"></textarea>
           </div>
           <button type="submit" class="btn btn-primary w-full glow-coral hover-glow-coral mt-2">
             Post Request
@@ -549,6 +584,7 @@ function renderCreateRequestPage() {
       const room = document.getElementById('create-room').value;
       const time = document.getElementById('create-time').value;
       const reward = document.getElementById('create-reward').value;
+      const instructions = document.getElementById('create-instructions').value;
 
       const user = Storage.getUser();
       if (!user) {
@@ -565,7 +601,9 @@ function renderCreateRequestPage() {
         description: desc,
         reward: parseInt(reward, 10),
         arrivalTime: time,
+        deliveryInstructions: instructions,
         status: 'pending',
+        requesterPhone: user.phone || '',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
@@ -650,20 +688,36 @@ function initAuthListener() {
           // Merge in latest Google info if Firestore is missing it
           if (!userData.name) userData.name = user.displayName || 'NITW Student';
           if (!userData.photoURL) userData.photoURL = user.photoURL || '';
+
+          // FORCED EXTRACTION: Ensure auto-extracted fields are present and valid
+          if (!userData.year || !userData.department || userData.year.includes('Edit') || userData.year === 'Unknown') {
+            const extractedData = Utils.extractNitwEmailData(user.email) || {};
+            userData.year = extractedData.year || 'Unknown';
+            userData.department = extractedData.department || 'Unknown';
+            userData.branch = extractedData.branch || 'Unknown';
+            userData.rollNumber = user.email ? user.email.split('@')[0] : 'NITW Student';
+          }
+
           userData.lastLogin = Date.now();
         } else {
+          // Auto-extract data from email
+          const extractedData = Utils.extractNitwEmailData(user.email) || {};
+
+          // Map user data for the Profile page
           userData = {
             uid: user.uid,
             email: user.email || '',
             name: user.displayName || 'NITW Student',
-            avatarInitial: (user.displayName || 'U').charAt(0).toUpperCase(),
-            rollNumber: 'Edit profile to set',
-            year: 'Edit profile to set',
-            department: 'Edit profile to set',
-            hostel: 'Edit profile to set',
-            phone: '',
-            provider: 'google',
+            displayName: user.displayName || '',
             photoURL: user.photoURL || '',
+            provider: 'google',
+            avatarInitial: (user.displayName || 'U').charAt(0).toUpperCase(),
+            rollNumber: user.email ? user.email.split('@')[0] : 'NITW Student',
+            year: extractedData.year || 'Unknown',
+            department: extractedData.department || 'Unknown',
+            branch: extractedData.branch || 'Unknown',
+            hostel: 'Not set',
+            phone: user.phoneNumber || '',
             lastLogin: Date.now()
           };
         }
@@ -680,11 +734,13 @@ function initAuthListener() {
       const currentHash = window.location.hash || '#/';
       if (currentHash === '#/login' || currentHash === '#/') {
         // Double check if we still have a user in Firebase Auth before redirecting
-        // This helps prevent auto-login on mobile immediately after signOut
         if (auth.currentUser) {
-          console.log('[DIANOMY] Authenticated user on auth/landing page, redirecting to profile...');
+          const userData = Storage.getUser();
+          const needsPhone = !userData || !userData.phone || userData.phone === '+91 XXXXX XXXXX';
+
+          console.log('[DIANOMY] Authenticated user on auth/landing page, redirecting...');
           setTimeout(() => {
-            Router.navigate('#/profile');
+            Router.navigate(needsPhone ? '#/verify-phone' : '#/profile');
           }, 100);
         }
       }
@@ -797,6 +853,11 @@ document.addEventListener('DOMContentLoaded', function () {
   Router.register('#/runner-dashboard', function () {
     renderNavbar();
     renderRunnerDashboardPage();
+  });
+
+  Router.register('#/verify-phone', function () {
+    renderNavbar();
+    VerifyPhone.render();
   });
 
   Router.register('#/profile', function () {

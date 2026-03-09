@@ -1,11 +1,4 @@
-/* ═══════════════════════════════════════════════════════════
-   DIANOMY — Profile Page
-   User details, stats, and logout.
-   ═══════════════════════════════════════════════════════════ */
-
 const Profile = {
-  isEditing: false,
-
   render() {
     const page = document.getElementById('page-profile');
     page.classList.add('active');
@@ -50,12 +43,8 @@ const Profile = {
               <span class="profile-avatar-initial">${user.avatarInitial}</span>
             </div>
             
-            ${this.isEditing ? `
-                <input type="text" id="edit-name" class="input-field" value="${user.name}" style="font-size:1.25rem; font-weight:700; text-align:center; position:relative; z-index:10; margin-bottom:0.5rem;" />
-            ` : `
-                <h1 class="profile-name">${user.name}</h1>
-            `}
-            <p class="profile-roll">${user.rollNumber}</p>
+            <h1 class="profile-name">${user.name}</h1>
+            <p class="profile-roll">${user.rollNumber || ''}</p>
 
             <div class="profile-details-grid">
               <div class="glass-subtle profile-detail-item">
@@ -63,44 +52,28 @@ const Profile = {
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
                   Class Of
                 </span>
-                ${this.isEditing ? `
-                    <input type="text" id="edit-year" class="input-field" value="${user.year}" style="padding:0.25rem 0.5rem; font-size:0.875rem;" />
-                ` : `
-                    <p class="profile-detail-value">${user.year}</p>
-                `}
+                <p class="profile-detail-value">${user.year}</p>
               </div>
               <div class="glass-subtle profile-detail-item">
                 <span class="profile-detail-label">
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                   Department
                 </span>
-                ${this.isEditing ? `
-                    <input type="text" id="edit-dept" class="input-field" value="${user.department}" style="padding:0.25rem 0.5rem; font-size:0.875rem;" />
-                ` : `
-                    <p class="profile-detail-value truncate" title="${user.department}">${user.department}</p>
-                `}
+                <p class="profile-detail-value truncate" title="${user.department}">${user.department}</p>
               </div>
               <div class="glass-subtle profile-detail-item">
                 <span class="profile-detail-label">
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                   Phone
                 </span>
-                ${this.isEditing ? `
-                    <input type="text" id="edit-phone" class="input-field" value="${user.phone}" style="padding:0.25rem 0.5rem; font-size:0.875rem;" />
-                ` : `
-                    <p class="profile-detail-value">${user.phone}</p>
-                `}
+                <p class="profile-detail-value">${user.phone}</p>
               </div>
               <div class="glass-subtle profile-detail-item">
                 <span class="profile-detail-label">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>
-                  Hostel
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-7-7 7"/><path d="M12 14V3"/></svg>
+                  Branch
                 </span>
-                ${this.isEditing ? `
-                    <input type="text" id="edit-hostel" class="input-field" value="${user.hostel}" style="padding:0.25rem 0.5rem; font-size:0.875rem;" />
-                ` : `
-                    <p class="profile-detail-value">${user.hostel}</p>
-                `}
+                <p class="profile-detail-value">${user.branch || 'Auto-filled'}</p>
               </div>
             </div>
 
@@ -108,18 +81,6 @@ const Profile = {
           </div>
         </div>
         
-        <div class="animate-fade-in delay-200">
-            ${this.isEditing ? `
-                <button class="btn btn-primary w-full glow-teal hover-glow-teal" id="profile-save-btn" style="background:var(--accent);color:var(--accent-foreground)">
-                    Save Profile
-                </button>
-            ` : `
-                <button class="btn btn-outline w-full" id="profile-edit-btn">
-                    Edit Profile
-                </button>
-            `}
-        </div>
-
         <div class="profile-stats animate-fade-in-up delay-400">
           <div class="glass card card-hover profile-stat" style="border-radius:var(--radius)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="profile-stat-icon"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
@@ -151,73 +112,6 @@ const Profile = {
   },
 
   _bindEvents(page) {
-    const self = this;
-
-    const editBtn = page.querySelector('#profile-edit-btn');
-    if (editBtn) {
-      editBtn.addEventListener('click', function () {
-        self.isEditing = true;
-        sounds.click();
-        self.render();
-      });
-    }
-
-    const saveBtn = page.querySelector('#profile-save-btn');
-    if (saveBtn) {
-      saveBtn.addEventListener('click', async function () {
-        const user = Storage.getUser();
-        const userRef = db.collection('users').doc(user.uid);
-
-        try {
-          const doc = await userRef.get();
-          let userData;
-          if (doc.exists) {
-            userData = doc.data();
-            if (!userData.name) userData.name = user.displayName || 'NITW Student';
-            if (!userData.photoURL) userData.photoURL = user.photoURL || '';
-            userData.lastLogin = Date.now();
-          } else {
-            userData = {
-              uid: user.uid,
-              email: user.email || '',
-              name: user.displayName || 'NITW Student',
-              avatarInitial: (user.displayName || 'U').charAt(0).toUpperCase(),
-              rollNumber: 'Edit profile to set',
-              year: 'Edit profile to set',
-              department: 'Edit profile to set',
-              hostel: 'Edit profile to set',
-              phone: '',
-              provider: 'google',
-              photoURL: user.photoURL || '',
-              lastLogin: Date.now()
-            };
-          }
-
-          // Update fields from the form
-          userData.name = document.getElementById('edit-name').value;
-          userData.year = document.getElementById('edit-year').value;
-          userData.department = document.getElementById('edit-dept').value;
-          userData.phone = document.getElementById('edit-phone').value;
-          userData.hostel = document.getElementById('edit-hostel').value;
-          userData.avatarInitial = userData.name.charAt(0).toUpperCase();
-
-          await userRef.set(userData, { merge: true });
-          console.log('[DIANOMY] User profile saved to Firestore:', userData.email);
-
-          Storage.saveUser(userData);
-          self.isEditing = false;
-          sounds.success();
-          Notifications.success('Profile updated successfully!');
-
-          renderNavbar();
-          self.render();
-        } catch (err) {
-          console.error('Error saving profile:', err);
-          Notifications.error('Failed to save profile. Please try again.');
-        }
-      });
-    }
-
     const logoutBtn = page.querySelector('#profile-logout-btn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async function () {

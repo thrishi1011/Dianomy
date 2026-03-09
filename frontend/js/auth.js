@@ -117,6 +117,9 @@ const Auth = {
 
           console.log('[DIANOMY] Google Sign-in Success:', user.email);
 
+          // Auto-extract data from email
+          const extractedData = Utils.extractNitwEmailData(user.email) || {};
+
           // Map user data for the Profile page
           const userData = {
             uid: user.uid,
@@ -126,18 +129,34 @@ const Auth = {
             photoURL: user.photoURL || '',
             provider: 'google',
             avatarInitial: (user.displayName || 'U').charAt(0).toUpperCase(),
-            rollNumber: 'Click Edit to update',
-            year: 'Click Edit to update',
-            department: 'Click Edit to update',
-            hostel: 'Click Edit to update',
+            rollNumber: user.email ? user.email.split('@')[0] : 'NITW Student',
+            year: extractedData.year || 'Unknown',
+            department: extractedData.department || 'Unknown',
+            branch: extractedData.branch || 'Unknown',
+            hostel: 'Not set',
             phone: user.phoneNumber || ''
           };
 
           // Save to storage IMMEDIATELY before navigating to fix the race condition
           Storage.saveUser(userData);
 
+          // Proactively sync to Firestore during login as well to ensure persistence
+          try {
+            await db.collection('users').doc(user.uid).set(userData, { merge: true });
+            console.log('[DIANOMY] Profile synced to DB on login');
+          } catch (e) {
+            console.error('[DIANOMY] Failed to sync on login:', e);
+          }
+
           self._setLoading(false);
-          Router.navigate('#/profile');
+
+          // Check if phone verification is needed
+          if (!userData.phone || userData.phone === '+91 XXXXX XXXXX' || userData.phone === '') {
+            console.log('[DIANOMY] Phone verification required.');
+            Router.navigate('#/verify-phone');
+          } else {
+            Router.navigate('#/profile');
+          }
         } catch (error) {
           console.error('[DIANOMY] Google Sign-in Error:', error);
 

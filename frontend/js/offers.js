@@ -86,13 +86,14 @@ const Offers = {
           <p style="font-size:0.875rem;color:var(--muted-foreground);margin-bottom:1.5rem">Enter your details for the requester to see.</p>
           
           <div class="auth-form">
-            <div style="margin-bottom:1rem">
-              <label class="form-label">Your Name</label>
-              <input class="input-field" id="runner-name" placeholder="Enter your full name" required value="${Storage.getUser()?.name || ''}" />
-            </div>
-            <div style="margin-bottom:1.5rem">
-              <label class="form-label">Roll Number</label>
-              <input class="input-field" id="runner-roll" placeholder="Enter your roll number" required />
+            <div class="glass card p-4 mb-6" style="background: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.05);">
+              <p style="font-size:0.875rem; color:var(--foreground); margin-bottom:0.5rem">Sharing your profile with requester:</p>
+              <div style="font-size:0.75rem; color:var(--muted-foreground)">
+                <p>• <b>Name:</b> ${Storage.getUser()?.name}</p>
+                <p>• <b>Department:</b> ${Storage.getUser()?.department}</p>
+                <p>• <b>Branch:</b> ${Storage.getUser()?.branch}</p>
+                <p>• <b>Phone:</b> ${Storage.getUser()?.phone || 'Not set'}</p>
+              </div>
             </div>
             
             <div style="display:flex;gap:0.75rem">
@@ -108,14 +109,6 @@ const Offers = {
     document.getElementById('acceptance-backdrop').addEventListener('click', () => overlay.remove());
     document.getElementById('acceptance-cancel').addEventListener('click', () => { sounds.click(); overlay.remove(); });
     document.getElementById('acceptance-confirm').addEventListener('click', async () => {
-      const name = document.getElementById('runner-name').value.trim();
-      const roll = document.getElementById('runner-roll').value.trim();
-
-      if (!name || !roll) {
-        Notifications.error('Please enter both name and roll number.');
-        return;
-      }
-
       sounds.click();
       try {
         const user = Storage.getUser();
@@ -123,14 +116,18 @@ const Offers = {
           status: 'accepted',
           acceptedBy: user.name,
           acceptedByEmail: user.email,
-          runnerName: name,
-          runnerRoll: roll
+          runnerName: user.name,
+          runnerRoll: user.rollNumber || user.email.split('@')[0],
+          runnerYear: user.year || 'N/A',
+          runnerDept: user.department || 'N/A',
+          runnerBranch: user.branch || 'N/A',
+          runnerPhone: user.phone || ''
         });
 
         // Trigger notification
         await db.collection('notifications').add({
           toEmail: request.requesterEmail,
-          message: `Order Accepted: Your order "${request.description}" has been accepted by ${name} (Roll: ${roll}).`,
+          message: `Order Accepted: Your order "${request.description}" has been accepted by ${user.name}.`,
           orderId: request.id,
           type: 'acceptance',
           createdAt: firebase.firestore.FieldValue.serverTimestamp()

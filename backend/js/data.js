@@ -50,7 +50,7 @@ function simulateFetchUserDetails(email, provider) {
     name: name,
     year: year,
     rollNumber: rollNumber,
-    phone: '+91 XXXXX XXXXX',
+    phone: '+91 XXXXX XXXXX', // Placeholder for new users
     department: department,
     hostel: 'Not Set',
     avatarInitial: name.charAt(0).toUpperCase(),

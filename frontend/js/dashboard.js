@@ -111,6 +111,12 @@ const Dashboard = {
             ₹${req.reward}
           </span>
         </div>
+        ${!showAccept && Storage.getUser()?.email === req.acceptedByEmail && req.deliveryInstructions ? `
+          <div class="glass card p-3 mt-3 animate-pulse-subtle" style="border: 1px dashed var(--primary); background: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.05);">
+            <p style="font-size:0.65rem; font-weight:700; color:var(--primary); margin-bottom:0.25rem; text-transform:uppercase; letter-spacing:0.05em">Delivery Instructions</p>
+            <p style="font-size:0.875rem; color:var(--foreground)">${req.deliveryInstructions}</p>
+          </div>
+        ` : ''}
         ${showAccept && req.status === 'pending' ? `
           <button class="btn btn-primary w-full hover-glow-coral" data-accept-id="${req.id}">
             Accept & Deliver
@@ -240,17 +246,27 @@ const Dashboard = {
           </p>
           
           <div class="glass card p-4" style="margin-bottom:1.5rem">
-            <div style="margin-bottom:0.75rem">
-              <label class="form-label" style="font-size:0.65rem">FULL NAME</label>
-              <p style="font-weight:600; font-size:1rem">${req.runnerName}</p>
+            <div style="margin-bottom:0.75rem; display:flex; justify-content:space-between">
+              <div>
+                <label class="form-label" style="font-size:0.65rem">FULL NAME</label>
+                <p style="font-weight:600; font-size:1rem">${req.runnerName}</p>
+              </div>
+              <div style="text-align:right">
+                <label class="form-label" style="font-size:0.65rem">CLASS OF</label>
+                <p style="font-weight:600; font-size:0.9rem">${req.runnerYear || 'N/A'}</p>
+              </div>
             </div>
             <div style="margin-bottom:0.75rem">
-              <label class="form-label" style="font-size:0.65rem">ROLL NUMBER</label>
-              <p style="font-family:var(--font-mono); font-size:0.9rem">${req.runnerRoll}</p>
+              <label class="form-label" style="font-size:0.65rem">DEPARTMENT & BRANCH</label>
+              <p style="font-size:0.9rem">${req.runnerDept || 'N/A'} - ${req.runnerBranch || ''}</p>
             </div>
-            <div>
+            <div style="margin-bottom:0.75rem">
               <label class="form-label" style="font-size:0.65rem">EMAIL</label>
               <p style="font-size:0.875rem">${req.acceptedByEmail}</p>
+            </div>
+            <div>
+              <label class="form-label" style="font-size:0.65rem">PHONE NUMBER</label>
+              <p style="font-weight:700; font-size:1.1rem; color:var(--primary)">${req.runnerPhone || 'No phone provided'}</p>
             </div>
           </div>
           
