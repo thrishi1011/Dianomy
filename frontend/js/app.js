@@ -410,20 +410,6 @@ function renderLandingPage() {
         </div>
       </div>
 
-      <div class="stats-row animate-fade-in delay-600">
-        <div class="glass-subtle stat-item hover-lift">
-          <p class="stat-value">24/7</p>
-          <p class="stat-label">Gate Pickups</p>
-        </div>
-        <div class="glass-subtle stat-item hover-lift">
-          <p class="stat-value">&lt;10 min</p>
-          <p class="stat-label">Avg. Delivery</p>
-        </div>
-        <div class="glass-subtle stat-item hover-lift">
-          <p class="stat-value">100%</p>
-          <p class="stat-label">Campus Trust</p>
-        </div>
-      </div>
 
       <div class="scroll-indicator">
         <span>Scroll</span>

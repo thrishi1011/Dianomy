@@ -80,9 +80,56 @@ const VerifyPhone = {
         }
 
         const fullPhone = `+91 ${phone}`;
-        this._setLoading(true);
         this._hideError();
 
+        // Show confirmation dialog instead of saving directly
+        this._showConfirmDialog(fullPhone);
+    },
+
+    _showConfirmDialog(fullPhone) {
+        // Remove existing if any
+        this._hideConfirmDialog();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'phone-confirm-dialog';
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+            <div class="modal-backdrop" id="phone-confirm-backdrop"></div>
+            <div class="modal-content">
+                <div class="glass-strong p-6 text-center" style="border-radius:var(--radius)">
+                    <div style="width:3.5rem;height:3.5rem;border-radius:1rem;background:hsla(var(--primary-h),var(--primary-s),var(--primary-l),0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem" class="animate-scale-in">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </div>
+                    <h2 style="font-family:var(--font-display);font-size:1.125rem;font-weight:700;color:var(--foreground);margin-bottom:0.25rem">Confirm Number</h2>
+                    <p style="font-size:0.875rem;color:var(--muted-foreground);margin-bottom:1.5rem">Is <strong>${fullPhone}</strong> correct? You won't be able to change it later.</p>
+                    <div style="display:flex;gap:0.75rem">
+                        <button class="btn btn-outline" style="flex:1" id="confirm-phone-edit">Edit</button>
+                        <button class="btn btn-primary" style="flex:1;font-weight:600" id="confirm-phone-save">Yes, Confirm</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        document.getElementById('phone-confirm-backdrop').addEventListener('click', () => this._hideConfirmDialog());
+        document.getElementById('confirm-phone-edit').addEventListener('click', () => {
+            sounds.click();
+            this._hideConfirmDialog();
+        });
+        document.getElementById('confirm-phone-save').addEventListener('click', () => {
+            sounds.success();
+            this._hideConfirmDialog();
+            this._performActualSave(fullPhone);
+        });
+    },
+
+    _hideConfirmDialog() {
+        const existing = document.getElementById('phone-confirm-dialog');
+        if (existing) existing.remove();
+    },
+
+    async _performActualSave(fullPhone) {
+        this._setLoading(true);
         try {
             const currentUser = Storage.getUser();
             if (!currentUser) {
@@ -102,12 +149,11 @@ const VerifyPhone = {
             // Save to Storage
             Storage.saveUser(updatedUser);
 
-            sounds.success();
             Notifications.success('Profile completed successfully!');
 
             setTimeout(() => {
                 Router.navigate('#/profile');
-            }, 800); // 800ms for visual feedback
+            }, 800);
 
         } catch (error) {
             console.error('[DIANOMY] Save Phone Error:', error);
