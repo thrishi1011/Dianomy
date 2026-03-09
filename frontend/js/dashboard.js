@@ -39,14 +39,41 @@ const Dashboard = {
 
     const currentUserEmail = Storage.getUser()?.email;
 
-    let filtered = this.activeTab === 'All'
-      ? this.requests.filter(r => r.status !== 'delivered' && r.status !== 'not_delivered')
-      : this.requests.filter(r => {
-        if (r.status === 'delivered') {
-          return (r.requesterEmail === currentUserEmail || r.acceptedByEmail === currentUserEmail);
-        }
-        return r.status === this.activeTab.toLowerCase().replace(' ', '_');
-      });
+    const statusPriority = {
+      'accepted': 1,
+      'waiting_confirmation': 2,
+      'pending': 3,
+      'delivered': 4,
+      'not_delivered': 5
+    };
+
+    let filtered = this.requests.filter(r => {
+      // 1. Tab-based filtering
+      if (this.activeTab === 'All') {
+        if (r.status === 'delivered' || r.status === 'not_delivered') return false;
+      } else {
+        const tabStatus = this.activeTab.toLowerCase().replace(' ', '_');
+        if (r.status !== tabStatus) return false;
+      }
+
+      // 2. Privacy-based filtering for delivered orders
+      if (r.status === 'delivered') {
+        return (r.requesterEmail === currentUserEmail || r.acceptedByEmail === currentUserEmail);
+      }
+
+      return true;
+    });
+
+    // 3. Custom Sorting: accepted, pending, delivered, not delivered
+    filtered.sort((a, b) => {
+      const pA = statusPriority[a.status] || 99;
+      const pB = statusPriority[b.status] || 99;
+      if (pA !== pB) return pA - pB;
+      // Secondary sort by date (newest first)
+      const dateA = a.createdAt?.seconds || 0;
+      const dateB = b.createdAt?.seconds || 0;
+      return dateB - dateA;
+    });
 
     if (this.searchQuery && (this.activeTab === 'Delivered' || this.activeTab === 'Not Delivered')) {
       filtered = filtered.filter(r => r.description.toLowerCase().includes(this.searchQuery.toLowerCase()));
