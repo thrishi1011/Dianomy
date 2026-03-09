@@ -668,88 +668,100 @@ function render404Page() {
 
 function initAuthListener() {
   // Set persistence to LOCAL explicitly to ensure consistency across devices
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(() => {
+    auth.onAuthStateChanged(async (user) => {
+      console.log('[DIANOMY] Auth State Changed. User:', user ? user.email : 'None');
 
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      // Top-level domain restriction enforcement
-      if (user.email && !user.email.endsWith('@student.nitw.ac.in')) {
-        auth.signOut();
-        Storage.removeUser();
-        renderNavbar();
-        return;
-      }
-
-      // Sync user profile to Firestore
-      userRef.get().then(doc => {
-        let userData;
-        if (doc.exists) {
-          userData = doc.data();
-          // Merge in latest Google info if Firestore is missing it
-          if (!userData.name) userData.name = user.displayName || 'NITW Student';
-          if (!userData.photoURL) userData.photoURL = user.photoURL || '';
-
-          // FORCED EXTRACTION: Ensure auto-extracted fields are present and valid
-          if (!userData.year || !userData.department || userData.year.includes('Edit') || userData.year === 'Unknown') {
-            const extractedData = Utils.extractNitwEmailData(user.email) || {};
-            userData.year = extractedData.year || 'Unknown';
-            userData.department = extractedData.department || 'Unknown';
-            userData.branch = extractedData.branch || 'Unknown';
-            userData.rollNumber = user.email ? user.email.split('@')[0] : 'NITW Student';
-          }
-
-          userData.lastLogin = Date.now();
-        } else {
-          // Auto-extract data from email
-          const extractedData = Utils.extractNitwEmailData(user.email) || {};
-
-          // Map user data for the Profile page
-          userData = {
-            uid: user.uid,
-            email: user.email || '',
-            name: user.displayName || 'NITW Student',
-            displayName: user.displayName || '',
-            photoURL: user.photoURL || '',
-            provider: 'google',
-            avatarInitial: (user.displayName || 'U').charAt(0).toUpperCase(),
-            rollNumber: user.email ? user.email.split('@')[0] : 'NITW Student',
-            year: extractedData.year || 'Unknown',
-            department: extractedData.department || 'Unknown',
-            branch: extractedData.branch || 'Unknown',
-            hostel: 'Not set',
-            phone: user.phoneNumber || '',
-            lastLogin: Date.now()
-          };
+      if (user) {
+        // Top-level domain restriction enforcement
+        if (user.email && !user.email.endsWith('@student.nitw.ac.in')) {
+          console.warn('[DIANOMY] Unauthorized domain access attempt:', user.email);
+          await auth.signOut();
+          Storage.removeUser();
+          renderNavbar();
+          Router.navigate('#/login');
+          return;
         }
 
-        userRef.set(userData, { merge: true }).then(() => {
+        const userRef = db.collection('users').doc(user.uid);
+
+        // Sync user profile from Firestore
+        try {
+          const doc = await userRef.get();
+          let userData;
+
+          if (doc.exists) {
+            userData = doc.data();
+            console.log('[DIANOMY] Existing user data found in Firestore');
+            // Merge in latest Google info if Firestore is missing it
+            if (!userData.name) userData.name = user.displayName || 'NITW Student';
+            if (!userData.photoURL) userData.photoURL = user.photoURL || '';
+
+            // FORCED EXTRACTION: Ensure auto-extracted fields are present and valid
+            if (!userData.year || !userData.department || userData.year.includes('Edit') || userData.year === 'Unknown') {
+              const extractedData = Utils.extractNitwEmailData(user.email) || {};
+              userData.year = extractedData.year || 'Unknown';
+              userData.department = extractedData.department || 'Unknown';
+              userData.branch = extractedData.branch || 'Unknown';
+              userData.rollNumber = user.email ? user.email.split('@')[0] : 'NITW Student';
+            }
+            userData.lastLogin = Date.now();
+          } else {
+            console.log('[DIANOMY] New user detected, creating profile');
+            // Auto-extract data from email
+            const extractedData = Utils.extractNitwEmailData(user.email) || {};
+
+            // Map user data for the Profile page
+            userData = {
+              uid: user.uid,
+              email: user.email || '',
+              name: user.displayName || 'NITW Student',
+              displayName: user.displayName || '',
+              photoURL: user.photoURL || '',
+              provider: 'google',
+              avatarInitial: (user.displayName || 'U').charAt(0).toUpperCase(),
+              rollNumber: user.email ? user.email.split('@')[0] : 'NITW Student',
+              year: extractedData.year || 'Unknown',
+              department: extractedData.department || 'Unknown',
+              branch: extractedData.branch || 'Unknown',
+              hostel: 'Not set',
+              phone: user.phoneNumber || '',
+              lastLogin: Date.now()
+            };
+          }
+
+          // Save back to Firestore and Storage
+          await userRef.set(userData, { merge: true });
           console.log('[DIANOMY] Profile synced:', userData.email);
           Storage.saveUser(userData);
           renderNavbar();
           initNotificationsListener(user.email);
-        }).catch(err => console.error('Error syncing user:', err));
-      });
 
-      // Automatic redirection if on login or landing page
-      const currentHash = window.location.hash || '#/';
-      if (currentHash === '#/login' || currentHash === '#/') {
-        // Double check if we still have a user in Firebase Auth before redirecting
-        if (auth.currentUser) {
-          const userData = Storage.getUser();
-          const needsPhone = !userData || !userData.phone || userData.phone === '+91 XXXXX XXXXX';
+          // Centralized Redirection Logic
+          const currentHash = window.location.hash || '#/';
+          // Only redirect if we are on landing or login pages
+          if (currentHash === '#/login' || currentHash === '#/') {
+            const hasValidPhone = userData.phone &&
+              userData.phone !== '+91 XXXXX XXXXX' &&
+              userData.phone.trim() !== '' &&
+              userData.phone.trim() !== '+91';
 
-          console.log('[DIANOMY] Authenticated user on auth/landing page, redirecting...');
-          setTimeout(() => {
-            Router.navigate(needsPhone ? '#/verify-phone' : '#/profile');
-          }, 100);
+            console.log('[DIANOMY] Redirecting. Valid phone:', hasValidPhone);
+            setTimeout(() => {
+              Router.navigate(hasValidPhone ? '#/profile' : '#/verify-phone');
+            }, 100);
+          }
+        } catch (err) {
+          console.error('[DIANOMY] Error syncing user:', err);
         }
+      } else {
+        console.log('[DIANOMY] No authenticated user.');
+        Storage.removeUser();
+        renderNavbar();
+        if (window._notifUnsubscribe) window._notifUnsubscribe();
       }
-    } else {
-      Storage.removeUser();
-      renderNavbar();
-      if (window._notifUnsubscribe) window._notifUnsubscribe();
-    }
-  });
+    });
+  }).catch(err => console.error('[DIANOMY] Persistence error:', err));
 }
 
 function initNotificationsListener(email) {

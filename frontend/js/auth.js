@@ -137,26 +137,14 @@ const Auth = {
             phone: user.phoneNumber || ''
           };
 
-          // Save to storage IMMEDIATELY before navigating to fix the race condition
+          // Save to storage IMMEDIATELY for quick feedback, but let app.js handle DB sync and routing
           Storage.saveUser(userData);
 
-          // Proactively sync to Firestore during login as well to ensure persistence
-          try {
-            await db.collection('users').doc(user.uid).set(userData, { merge: true });
-            console.log('[DIANOMY] Profile synced to DB on login');
-          } catch (e) {
-            console.error('[DIANOMY] Failed to sync on login:', e);
-          }
+          // We no longer call db.collection('users').doc(user.uid).set(...) here
+          // because it was overwriting existing fields like 'phone'.
+          // Redirection is also handled centrally in app.js initAuthListener.
 
           self._setLoading(false);
-
-          // Check if phone verification is needed
-          if (!userData.phone || userData.phone === '+91 XXXXX XXXXX' || userData.phone === '') {
-            console.log('[DIANOMY] Phone verification required.');
-            Router.navigate('#/verify-phone');
-          } else {
-            Router.navigate('#/profile');
-          }
         } catch (error) {
           console.error('[DIANOMY] Google Sign-in Error:', error);
 

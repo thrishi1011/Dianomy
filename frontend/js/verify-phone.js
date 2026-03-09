@@ -107,7 +107,7 @@ const VerifyPhone = {
 
             setTimeout(() => {
                 Router.navigate('#/profile');
-            }, 8000); // 800ms for visual feedback
+            }, 800); // 800ms for visual feedback
 
         } catch (error) {
             console.error('[DIANOMY] Save Phone Error:', error);
