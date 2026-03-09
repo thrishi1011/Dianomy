@@ -37,9 +37,16 @@ const Dashboard = {
     page.classList.add('active');
     page.className = 'page active dashboard-page';
 
+    const currentUserEmail = Storage.getUser()?.email;
+
     let filtered = this.activeTab === 'All'
       ? this.requests.filter(r => r.status !== 'delivered' && r.status !== 'not_delivered')
-      : this.requests.filter(r => r.status === this.activeTab.toLowerCase().replace(' ', '_'));
+      : this.requests.filter(r => {
+        if (r.status === 'delivered') {
+          return (r.requesterEmail === currentUserEmail || r.acceptedByEmail === currentUserEmail);
+        }
+        return r.status === this.activeTab.toLowerCase().replace(' ', '_');
+      });
 
     if (this.searchQuery && (this.activeTab === 'Delivered' || this.activeTab === 'Not Delivered')) {
       filtered = filtered.filter(r => r.description.toLowerCase().includes(this.searchQuery.toLowerCase()));
@@ -50,7 +57,7 @@ const Dashboard = {
       Pending: this.requests.filter(r => r.status === 'pending').length,
       Accepted: this.requests.filter(r => r.status === 'accepted').length,
       'Waiting Confirmation': this.requests.filter(r => r.status === 'waiting_confirmation').length,
-      Delivered: this.requests.filter(r => r.status === 'delivered').length,
+      Delivered: this.requests.filter(r => r.status === 'delivered' && (r.requesterEmail === currentUserEmail || r.acceptedByEmail === currentUserEmail)).length,
       'Not Delivered': this.requests.filter(r => r.status === 'not_delivered').length
     };
 
@@ -179,8 +186,10 @@ const Dashboard = {
       searchInput.addEventListener('input', function () {
         self.searchQuery = this.value;
         const list = document.getElementById('request-list');
+        const user = Storage.getUser();
+
         const filtered = self.activeTab === 'Delivered'
-          ? self.requests.filter(r => r.status === 'delivered')
+          ? self.requests.filter(r => r.status === 'delivered' && (r.requesterEmail === user?.email || r.acceptedByEmail === user?.email))
           : self.requests.filter(r => r.status === 'not_delivered');
 
         const matching = filtered.filter(r => r.description.toLowerCase().includes(self.searchQuery.toLowerCase()));
