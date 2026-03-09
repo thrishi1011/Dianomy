@@ -121,7 +121,8 @@ const Offers = {
           runnerYear: user.year || 'N/A',
           runnerDept: user.department || 'N/A',
           runnerBranch: user.branch || 'N/A',
-          runnerPhone: user.phone || ''
+          runnerPhone: user.phone || '',
+          acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
         // Trigger notification

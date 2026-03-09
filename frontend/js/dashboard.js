@@ -6,6 +6,7 @@
 const Dashboard = {
   requests: [],
   activeTab: 'All',
+  searchQuery: '',
   tabs: ['All', 'Pending', 'Accepted', 'Waiting Confirmation', 'Delivered', 'Not Delivered'],
 
   init() {
@@ -36,9 +37,13 @@ const Dashboard = {
     page.classList.add('active');
     page.className = 'page active dashboard-page';
 
-    const filtered = this.activeTab === 'All'
+    let filtered = this.activeTab === 'All'
       ? this.requests.filter(r => r.status !== 'delivered' && r.status !== 'not_delivered')
       : this.requests.filter(r => r.status === this.activeTab.toLowerCase().replace(' ', '_'));
+
+    if (this.searchQuery && (this.activeTab === 'Delivered' || this.activeTab === 'Not Delivered')) {
+      filtered = filtered.filter(r => r.description.toLowerCase().includes(this.searchQuery.toLowerCase()));
+    }
 
     const counts = {
       All: this.requests.filter(r => r.status !== 'delivered' && r.status !== 'not_delivered').length,
@@ -63,6 +68,15 @@ const Dashboard = {
             </button>
           `).join('')}
         </div>
+
+        ${(this.activeTab === 'Delivered' || this.activeTab === 'Not Delivered') ? `
+          <div class="search-container mb-6 animate-fade-in">
+            <div style="position:relative">
+              <input type="text" id="dashboard-search" class="input-field" placeholder="Search orders by name..." value="${this.searchQuery}" style="padding-left:2.75rem">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--muted-foreground)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </div>
+          </div>
+        ` : ''}
 
         <div class="request-list" id="request-list">
           ${filtered.length === 0
@@ -112,9 +126,16 @@ const Dashboard = {
           </span>
         </div>
         ${!showAccept && Storage.getUser()?.email === req.acceptedByEmail && req.deliveryInstructions ? `
-          <div class="glass card p-4 mt-4" style="background: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.1); border: 1px solid hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.2); border-radius: var(--radius-sm)">
-            <p style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05em">Delivery Instructions</p>
-            <p style="font-size:0.925rem; color:var(--foreground); line-height:1.5">${req.deliveryInstructions}</p>
+          <div class="glass card p-6 mt-4" style="background: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.1); border: 1px solid hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.2); border-radius: var(--radius-sm)">
+            <p style="font-size:0.75rem; font-weight:700; color:var(--primary); margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.05em">Delivery Instructions</p>
+            <p style="font-size:0.95rem; color:var(--foreground); line-height:1.6; padding: 0.5rem; background: rgba(0,0,0,0.2); border-radius: 4px;">${req.deliveryInstructions}</p>
+          </div>
+        ` : ''}
+        
+        ${(req.status === 'delivered' || req.status === 'not_delivered') ? `
+          <div class="mt-4 pt-4 border-t" style="border-color: hsla(0,0%,100%,0.05); display: flex; flex-direction: column; gap: 0.25rem;">
+            <p style="font-size:0.7rem; color:var(--muted-foreground)">Posted on: <span style="color:var(--foreground)">${req.createdAt ? new Date(req.createdAt.seconds * 1000).toLocaleString() : 'N/A'}</span></p>
+            ${req.acceptedAt ? `<p style="font-size:0.7rem; color:var(--muted-foreground)">Accepted on: <span style="color:var(--foreground)">${new Date(req.acceptedAt.seconds * 1000).toLocaleString()}</span></p>` : ''}
           </div>
         ` : ''}
         ${showAccept && req.status === 'pending' ? `
@@ -151,6 +172,24 @@ const Dashboard = {
         self.render();
       });
     });
+
+    // Search events
+    const searchInput = page.querySelector('#dashboard-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', function () {
+        self.searchQuery = this.value;
+        const list = document.getElementById('request-list');
+        const filtered = self.activeTab === 'Delivered'
+          ? self.requests.filter(r => r.status === 'delivered')
+          : self.requests.filter(r => r.status === 'not_delivered');
+
+        const matching = filtered.filter(r => r.description.toLowerCase().includes(self.searchQuery.toLowerCase()));
+
+        list.innerHTML = matching.length === 0
+          ? '<p class="empty-state">No matching orders found.</p>'
+          : matching.map(req => self._renderRequestCard(req, false)).join('');
+      });
+    }
 
     // Mark as Delivered clicks (Runner action)
     page.querySelectorAll('[data-deliver-id]').forEach(function (btn) {

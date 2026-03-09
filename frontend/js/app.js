@@ -548,14 +548,10 @@ function renderCreateRequestPage() {
           <div class="form-grid-2">
             <div>
               <label class="form-label">Expected Arrival</label>
-              <select class="input-field" id="create-time" required style="appearance: auto; background-color: var(--secondary); color: white;">
-                <option value="" disabled selected style="background-color: var(--background); color: white;">Select Time</option>
-                <option value="ASAP" style="background-color: var(--background); color: white;">ASAP (Next 15 mins)</option>
-                <option value="30 mins" style="background-color: var(--background); color: white;">In 30 mins</option>
-                <option value="1 hour" style="background-color: var(--background); color: white;">In 1 hour</option>
-                <option value="Evening" style="background-color: var(--background); color: white;">Today Evening</option>
-                <option value="Tomorrow" style="background-color: var(--background); color: white;">Tomorrow</option>
-              </select>
+              <div class="input-field-wrapper" style="position:relative">
+                <input type="time" id="create-time" class="input-field" required style="appearance: none; background-color: var(--secondary); color: white; width: 100%;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--primary)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
             </div>
             <div>
               <label class="form-label">Reward (₹)</label>
