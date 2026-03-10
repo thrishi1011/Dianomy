@@ -1,70 +1,68 @@
 # DIANOMY — Campus Last-Mile Delivery
 
-Student-driven last-mile delivery app. Gate to hostel, delivered by students.
+**DIANOMY** is a student-driven, last-mile delivery platform designed specifically for the NITW campus. It bridges the gap between the campus gate and hostel rooms, allowing students to request and fulfill deliveries within their own community.
 
-## How to Run
+---
 
-Simply open `index.html` in your browser. No build tools, no `npm install`, no server required.
+## 🚀 Vision
+Built by students, for students. DIANOMY empowers the campus community by providing a seamless, secure, and efficient way to get packages delivered from the gate to the hostel, all while enabling students to earn or help others during their routine commutes.
 
-```
-1. Double-click index.html
-   — or —
-   Open it in your browser via File > Open
-```
+## 🛠️ Tech Stack
+- **Frontend**: Pure HTML5, CSS3 (Glassmorphism, Custom Properties, Responsive Design), and Vanilla JavaScript.
+- **Backend-as-a-Service**: **Firebase** (Authentication & Cloud Firestore) for real-time data and secure access.
+- **Interactive UI**: 
+    - **Canvas API**: Dynamic particle backgrounds.
+    - **Web Audio API**: Immersive UI sound effects.
+    - **Animations**: Custom CSS keyframes and transitions for a premium feel.
 
-## Project Structure
-
-```
+## 📦 Project Structure
+```text
 dianomy/
-│
 ├── frontend/
 │   ├── css/
-│   │   ├── main.css          # Page layouts, reset, utilities
-│   │   ├── animations.css    # Keyframes & transitions
-│   │   ├── responsive.css    # Media queries
-│   │   └── themes.css        # Dark/light theme tokens
+│   │   ├── main.css          # Layouts, resets, and utility classes
+│   │   ├── animations.css    # UI motion and transitions
+│   │   ├── responsive.css    # Mobile-first media queries
+│   │   └── themes.css        # Adaptive dark/light theme tokens
 │   ├── js/
-│   │   ├── app.js            # Main entry, animated background, navbar
-│   │   ├── router.js         # Hash-based SPA router
-│   │   ├── auth.js           # Login / OTP page
-│   │   ├── dashboard.js      # Delivery requests dashboard
-│   │   ├── offers.js         # Runner mode (accept deliveries)
-│   │   ├── profile.js        # User profile page
-│   │   └── settings.js       # Sound effects & mute toggle
-│   └── assets/
-│       └── logo.svg          # App logo
-│
+│   │   ├── app.js            # Main entry & global state management
+│   │   ├── router.js         # Custom hash-based SPA router
+│   │   ├── auth.js           # Google Auth & student domain validation
+│   │   ├── verify-phone.js   # Firebase Phone Auth / OTP logic
+│   │   ├── dashboard.js      # Order management for Requesters
+│   │   ├── offers.js         # Runner mode — find and accept orders
+│   │   ├── profile.js        # Student profile & data persistence
+│   │   ├── settings.js       # App preferences & sound controls
+│   │   └── utils.js          # Shared helper functions
+│   └── assets/               # SVGs, Icons, and visual assets
 ├── backend/
 │   └── js/
-│       ├── storage.js        # SessionStorage auth helpers
-│       ├── data.js           # Mock delivery data & user simulation
-│       └── notifications.js  # Toast notification system
-│
-├── design/
-│   ├── tokens.css            # Design tokens (colors, fonts, spacing)
-│   └── components.css        # Reusable component styles
-│
-├── index.html                # Main entry point
-├── .gitignore
-└── README.md
+│       ├── firebase-config.js # Firebase initialization & API keys
+│       ├── storage.js        # Persistent state helpers
+│       ├── data.js           # Firestore data models & interactions
+│       └── notifications.js  # Real-time toast system
+├── design/                   # Core Design System (Tokens & Components)
+├── index.html                # Single Page Application Entry
+├── .firebaserc               # Firebase project mapping
+├── firebase.json             # Hosting & rules configuration
+└── README.md                 # Project Documentation
 ```
 
-## Technologies
+## ✨ Key Features
+- **Secure Campus Login**: Restricted authentication for `@student.nitw.ac.in` accounts using **Google Sign-in**.
+- **Verified Deliveries**: Integrated **Phone Verification (OTP)** to ensure trust and reliability between users.
+- **Dynamic Dashboard**: Requesters can post, track, and manage their delivery orders in real-time.
+- **Runner Mode**: Students can switch to 'Runner' mode to browse available requests and earn rewards.
+- **Smart Order Lifecycle**: Comprehensive tracking through `Accepted`, `Pending`, `Delivered`, and `Not Delivered` statuses.
+- **Privacy-First Design**: Sensitive order details for delivered items are restricted to the involved parties.
+- **Premium Experience**: A stunning **Dark Glassmorphism** interface with animated backgrounds and haptic-like sound feedback.
 
-- **HTML5** — Semantic markup
-- **CSS3** — Custom properties, Glassmorphism, Gradients, Animations
-- **Vanilla JavaScript** — No frameworks, no dependencies
-- **Web Audio API** — UI sound effects
-- **Canvas API** — Animated particle background
+## 🛠️ Getting Started
+DIANOMY is built as a lightweight SPA. Since it uses Firebase, a local web server is recommended for the best experience (to handle Auth redirects correctly).
 
-## Features
+1. Clone the repository.
+2. Serve the root directory using a local server (e.g., VS Code Live Server).
+3. Open the local URL in your browser.
 
-- 🎓 Campus email + OTP login (simulated)
-- 📦 Post delivery requests
-- 🏃 Runner mode — accept & deliver
-- 👤 Auto-populated user profiles
-- 🔊 Interactive sound effects
-- ✨ Animated particle canvas background
-- 🌙 Dark glassmorphism UI
-
-© 2026 DIANOMY. Built by students, for students.
+---
+© 2026 DIANOMY. **Efficiency. Community. Delivery.**
